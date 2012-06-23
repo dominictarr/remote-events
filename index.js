@@ -3,7 +3,7 @@ var es = require('event-stream')
 
 module.exports = RemoteEventEmitter
 
-function RemoteEventEmitter () {
+function RemoteEventEmitter (opts) {
   EventEmitter.call(this)
   this.buffer = []
   //XXX RemoteEventEmitters start off disconnected!
@@ -35,8 +35,9 @@ ree.getStream = function () {
   var pipe = this.stream.pipe
   this.stream.pipe = function (other, opts) {
     self.connected = true
-    pipe.call(this, other, opts)
+    var r = pipe.call(this, other, opts)
     self.localEmit('connect')
+    return r
   }
   return this.stream
 }
