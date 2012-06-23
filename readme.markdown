@@ -49,6 +49,6 @@ then you will have a very [socket.io](http://socket.io) like interface (but with
 
 however, I recommend instead wrap this with [browser-stream](http://github.com/dominictarr/browser-stream) -- which will allow you to multiplex streams through `RemoteEventEmitter`
 
-which will be useful for A) keeping nice `Stream` abstractions when you have a limited budget for connections (like in the browser) and B) seperating interprocess communication abstractions (such as [dnode](http://github.com/substack/dnode) or (crdt)[http://github.com/dominictarr/crdt]. this has been a problem with libraries using the socket.io api directly.
+which will be useful for A) keeping nice `Stream` abstractions when you have a limited budget for connections (like in the browser) and B) seperating interprocess communication abstractions (such as [dnode](http://github.com/substack/dnode) or [crdt](http://github.com/dominictarr/crdt). This has been a problem with libraries using the socket.io api directly.
 
 
