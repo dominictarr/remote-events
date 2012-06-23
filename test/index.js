@@ -1,5 +1,6 @@
 var RemoteEventEmitter = require('..')
 var a = require('assertions')
+var next = process.nextTick
 var A = new RemoteEventEmitter()
 var B = new RemoteEventEmitter()
 
@@ -10,37 +11,43 @@ a.equal(B.connected, false)
 
 A.getStream().pipe(B.getStream())
 
-a.equal(A.connected, true)
-a.equal(B.connected, false)
+next(function () {
 
-B.getStream().pipe(A.getStream())
+  a.equal(A.connected, true)
+  a.equal(B.connected, false)
 
-a.equal(B.connected, true)
+  B.getStream().pipe(A.getStream())
 
-B.on('hello', function (hi) {
-  helloB = true
-  a.equal(hi, 'HELLO THERE')
+  next(function () {
+
+    a.equal(B.connected, true)
+
+    B.on('hello', function (hi) {
+      helloB = true
+      a.equal(hi, 'HELLO THERE')
+    })
+
+    A.emit('hello', 'HELLO THERE')
+
+    a.equal(helloB, true)
+
+    helloB = false
+
+    var disconnectA, disconnectB
+    A.once('disconnect', function () {
+      disconnectA = true
+    })
+    B.once('disconnect', function () {
+      disconnectB = true
+    })
+
+    A.disconnect()
+
+    a.equal(disconnectA, true)
+    a.equal(disconnectB, true)
+    a.equal(A.connected, false)
+    a.equal(B.connected, false)
+
+  })
+
 })
-
-A.emit('hello', 'HELLO THERE')
-
-a.equal(helloB, true)
-
-helloB = false
-
-var disconnectA, disconnectB
-A.once('disconnect', function () {
-  disconnectA = true
-})
-B.once('disconnect', function () {
-  disconnectB = true
-})
-
-A.disconnect()
-
-a.equal(disconnectA, true)
-a.equal(disconnectB, true)
-a.equal(A.connected, false)
-a.equal(B.connected, false)
-
-
