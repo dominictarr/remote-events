@@ -11,20 +11,22 @@ function RemoteEventEmitter (opts) {
   //REMEMBER to call connect() !
   this.connected = false
   var self = this
-  this.on('connect', function () {
-    while(self.buffer.length)
-      self.emit.apply(self, self.buffer.shift())
-  })
+  this.on('connect', this.flush.bind(this))
 }
 
 var ree = RemoteEventEmitter.prototype = new EventEmitter ()
+
+ree.flush = function () {
+  while(this.buffer.length && this.connected) 
+    this.emit.apply(this, this.buffer.shift()) 
+}
 
 ree.getStream = function () {
   if (this.stream && !this.stream.ended)
     return this.stream
   var self = this
   this.stream = es.through(function (data) {
-    self.localEmit.apply(self, data)
+   self.localEmit.apply(self, data)
   }, function () {  
     this.emit('end')
     self.disconnect()
@@ -34,11 +36,15 @@ ree.getStream = function () {
   })
   var pipe = this.stream.pipe
   this.stream.pipe = function (other, opts) {
-    self.connected = true
     var r = pipe.call(this, other, opts)
-    self.localEmit('connect')
+    process.nextTick(function () {
+      self.connected = true
+      self.localEmit('connect')
+    })
     return r
   }
+  //return es.through()
+//  return es.through()
   return this.stream
 }
 
