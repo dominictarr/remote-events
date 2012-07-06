@@ -1,5 +1,5 @@
 var EventEmitter = require('events').EventEmitter
-var es = require('event-stream')
+var through = require('through')
 
 module.exports = RemoteEventEmitter
 
@@ -25,7 +25,7 @@ ree.getStream = function () {
   if (this.stream && !this.stream.ended)
     return this.stream
   var self = this
-  this.stream = es.through(function (data) {
+  this.stream = through(function (data) {
    self.localEmit.apply(self, data)
   }, function () {  
     this.emit('end')
@@ -49,9 +49,8 @@ ree.getStream = function () {
 ree.disconnect = function () {
   if(!this.connected) return
   this.connected = false
-  this.stream.destroy 
-    ? this.stream.destroy()
-    : this.stream.close() //work-around for sockjs
+  if(this.stream && this.stream.writable && !this.stream.ended)
+    this.stream.end()
   this.stream = null
   this.localEmit('disconnect')
 }
