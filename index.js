@@ -43,22 +43,15 @@ ree.getStream = function () {
     })
     return r
   }
-  //return es.through()
-//  return es.through()
   return this.stream
 }
-
-/*
-ree.connect = function () {
-  if(this.connected) return
-  this.localEmit('connect')
-
-*/
 
 ree.disconnect = function () {
   if(!this.connected) return
   this.connected = false
-  this.stream.destroy()
+  this.stream.destroy 
+    ? this.stream.destroy()
+    : this.stream.close() //work-around for sockjs
   this.stream = null
   this.localEmit('disconnect')
 }
