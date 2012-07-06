@@ -31,7 +31,7 @@ ree.getStream = function () {
     this.emit('end')
     self.disconnect()
   })
-  this.stream.once('close', function () {
+  this.stream.once('end', function () {
     self.disconnect()
   })
   var pipe = this.stream.pipe
