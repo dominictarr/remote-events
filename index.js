@@ -31,9 +31,6 @@ ree.getStream = function () {
     this.emit('end')
     self.disconnect()
   })
-  this.stream.once('end', function () {
-    self.disconnect()
-  })
   var pipe = this.stream.pipe
   this.stream.pipe = function (other, opts) {
     var r = pipe.call(this, other, opts)
@@ -50,7 +47,7 @@ ree.disconnect = function () {
   if(!this.connected) return
   this.connected = false
   if(this.stream && this.stream.writable && !this.stream.ended)
-    this.stream.end()
+    this.stream.emit('end')
   this.stream = null
   this.localEmit('disconnect')
 }
