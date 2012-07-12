@@ -1,14 +1,18 @@
-{ "name": "remote-events"
-, "version": "1.0.1"
-, "description": "a two ended EventEmitter connected through a Stream"
-, "homepage": "http://github.com/dominictarr/remote-events"
-, "repository": 
-  { "type": "git"
-  , "url": "https://github.com/dominictarr/remote-events.git" }
-, "dependencies": {
+{
+  "name": "remote-events",
+  "version": "1.1.0",
+  "description": "a two ended EventEmitter connected through a Stream",
+  "homepage": "http://github.com/dominictarr/remote-events",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dominictarr/remote-events.git"
+  },
+  "dependencies": {
     "through": "0",
     "event-stream": "~2.1"
-  }
-, "devDependencies": {
-    "assertions": "2"}
-, "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)" }
+  },
+  "devDependencies": {
+    "assertions": "2"
+  },
+  "author": "Dominic Tarr <dominic.tarr@gmail.com> (dominictarr.com)"
+}
