@@ -1,5 +1,6 @@
 var EventEmitter = require('events').EventEmitter
 var through = require('through')
+var es = require('event-stream')
 
 module.exports = RemoteEventEmitter
 
@@ -21,16 +22,27 @@ ree.flush = function () {
     this.emit.apply(this, this.buffer.shift()) 
 }
 
-ree.getStream = function () {
-  if (this.stream && !this.stream.ended)
+ree.getStream = function (raw) {
+//raw = true
+  raw = false
+  if (this.stream && !this._stream.ended)
     return this.stream
   var self = this
-  this.stream = through(function (data) {
+  this._stream = through(function (data) {
    self.localEmit.apply(self, data)
   }, function () {  
     this.emit('end')
     self.disconnect()
   })
+
+  this.stream = raw ? stream 
+    : es.connect(
+        es.split(),
+        es.parse(),
+        this._stream,
+        es.stringify()
+      )
+
   var pipe = this.stream.pipe
   this.stream.pipe = function (other, opts) {
     var r = pipe.call(this, other, opts)
@@ -46,8 +58,10 @@ ree.getStream = function () {
 ree.disconnect = function () {
   if(!this.connected) return
   this.connected = false
-  if(this.stream && this.stream.writable && !this.stream.ended)
-    this.stream.emit('end')
+  if(this._stream && this._stream.writable && !this._stream.ended)
+  this._stream.emit('end')
+  this._stream = null
+  this.stream.destroy()
   this.stream = null
   this.localEmit('disconnect')
 }
@@ -55,7 +69,7 @@ ree.disconnect = function () {
 ree.emit = function () {
   var args = [].slice.call(arguments)
   if(this.connected)
-    return this.stream.emit('data', args)
+    return this._stream.emit('data', args)
   else
     this.buffer.push(args)
 }
