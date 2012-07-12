@@ -4,12 +4,7 @@ var net = require('net')
 
 var server = net.createServer(function (con) {
   var ree = new RemoteEventEmitter()
-  con
-    .pipe(es.split())       //to lines
-    .pipe(es.parse())       //to objects
-    .pipe(ree.getStream())  //to events
-    .pipe(es.stringify())   //to json-lines
-    .pipe(con)              //to network
+  con.pipe(ree.getStream()).pipe(con)
 
   ree.on('ping', function (time) {
     console.log('PING', time)
@@ -20,12 +15,7 @@ var server = net.createServer(function (con) {
   var con = net.connect(2468)
   var ree = new RemoteEventEmitter()
   var str
-  con
-    .pipe(es.split())
-    .pipe(es.parse())
-    .pipe(ree.getStream())
-    .pipe(es.stringify())
-    .pipe(con)
+  con.pipe(ree.getStream()).pipe(con)
 
   var time = Date.now()
   ree.on('pong', function (_time) {
