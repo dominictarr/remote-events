@@ -35,7 +35,7 @@ ree.getStream = function (raw) {
     self.disconnect()
   })
 
-  this.stream = raw ? stream 
+  this.stream = raw ? this._stream 
     : es.connect(
         es.split(),
         es.parse(),
