@@ -1,6 +1,6 @@
 var EventEmitter = require('events').EventEmitter
 var through = require('through')
-var es = require('event-stream')
+var serializer = require('stream-serializer')
 
 module.exports = RemoteEventEmitter
 
@@ -12,14 +12,15 @@ function RemoteEventEmitter (opts) {
   //REMEMBER to call connect() !
   this.connected = false
   var self = this
+  this._opts = opts || {}
   this.on('connect', this.flush.bind(this))
 }
 
 var ree = RemoteEventEmitter.prototype = new EventEmitter ()
 
 ree.flush = function () {
-  while(this.buffer.length && this.connected) 
-    this.emit.apply(this, this.buffer.shift()) 
+  while(this.buffer.length && this.connected)
+    this.emit.apply(this, this.buffer.shift())
 }
 
 ree.getStream = function (raw) {
@@ -30,18 +31,13 @@ ree.getStream = function (raw) {
   var self = this
   this._stream = through(function (data) {
    self.localEmit.apply(self, data)
-  }, function () {  
+  }, function () {
     this.emit('end')
     self.disconnect()
   })
 
-  this.stream = raw ? this._stream 
-    : es.connect(
-        es.split(),
-        es.parse(),
-        this._stream,
-        es.stringify()
-      )
+  this.stream = raw ? this._stream
+    : serializer(this._opts.wrap)(this._stream)
 
   var pipe = this.stream.pipe
   this.stream.pipe = function (other, opts) {
@@ -77,7 +73,7 @@ ree.emit = function () {
 /*
   sometimes you need to access this, so I'm not using
   _emit ... that means this is a part of the API.
-  
+
 */
 ree.localEmit = function () {
   var args = [].slice.call(arguments)

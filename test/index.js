@@ -47,6 +47,7 @@ next(function () {
     a.equal(disconnectB, true)
     a.equal(A.connected, false)
     a.equal(B.connected, false)
+    console.log('test done')
 
   })
 

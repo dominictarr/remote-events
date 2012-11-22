@@ -16,7 +16,7 @@ var server = net.createServer(function (con) {
     ree.emit('pong', Date.now())
   })
 }).listen(2468, function () {
- 
+
   var con = net.connect(2468)
   var ree = new RemoteEventEmitter()
   con.pipe(ree.getStream()).pipe(con)
@@ -40,4 +40,9 @@ however, I recommend instead wrap this with [browser-stream](http://github.com/d
 
 which will be useful for A) keeping nice `Stream` abstractions when you have a limited budget for connections (like in the browser) and B) seperating interprocess communication abstractions (such as [dnode](http://github.com/substack/dnode) or [crdt](http://github.com/dominictarr/crdt). This has been a problem with libraries using the socket.io api directly.
 
+## options
 
+You can pass in `opts.wrap` to `RemoteEventEmitter` to set the
+wrapper function that should be used by [`stream-serializer`][1]
+
+  [1]: https://github.com/dominictarr/stream-serializer
