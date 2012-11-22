@@ -8,8 +8,8 @@
     "url": "https://github.com/dominictarr/remote-events.git"
   },
   "dependencies": {
-    "through": "0",
-    "event-stream": "~2.1"
+    "through": "~1.1.2",
+    "stream-serializer": "0.0.3"
   },
   "devDependencies": {
     "assertions": "2"
