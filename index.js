@@ -24,8 +24,7 @@ ree.flush = function () {
 }
 
 ree.getStream = function (raw) {
-//raw = true
-  raw = false
+
   if (this.stream && !this._stream.ended)
     return this.stream
   var self = this
