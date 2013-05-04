@@ -4,12 +4,11 @@ connect two EventEmitters through a stream!
 
 ``` js
 var RemoteEventEmitter = require('..')
-var es = require('event-stream')
 var net = require('net')
 
 var server = net.createServer(function (con) {
   var ree = new RemoteEventEmitter()
-  con.pipe(ree.getStream())
+  con.pipe(ree.getStream()).pipe(con)
 
   ree.on('ping', function (time) {
     console.log('PING', time)
