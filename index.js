@@ -1,6 +1,8 @@
 var EventEmitter = require('events').EventEmitter
 var through = require('through')
 var serializer = require('stream-serializer')
+var util = require('util');
+var events = require('events');
 
 module.exports = RemoteEventEmitter
 
@@ -16,14 +18,14 @@ function RemoteEventEmitter (opts) {
   this.on('connect', this.flush.bind(this))
 }
 
-var ree = RemoteEventEmitter.prototype = new EventEmitter ()
+util.inherits(RemoteEventEmitter, events.EventEmitter);
 
-ree.flush = function () {
+RemoteEventEmitter.prototype.flush = function () {
   while(this.buffer.length && this.connected)
     this.emit.apply(this, this.buffer.shift())
 }
 
-ree.getStream = function (raw) {
+RemoteEventEmitter.prototype.getStream = function (raw) {
 
   if (this.stream && !this._stream.ended)
     return this.stream
@@ -50,7 +52,7 @@ ree.getStream = function (raw) {
   return this.stream
 }
 
-ree.disconnect = function () {
+RemoteEventEmitter.prototype.disconnect = function () {
   if(!this.connected) return
   this.connected = false
   if(this._stream && this._stream.writable && !this._stream.ended)
@@ -61,7 +63,7 @@ ree.disconnect = function () {
   this.localEmit('disconnect')
 }
 
-ree.emit = function () {
+RemoteEventEmitter.prototype.emit = function () {
   var args = [].slice.call(arguments)
   if(this.connected)
     return this._stream.emit('data', args)
@@ -74,7 +76,7 @@ ree.emit = function () {
   _emit ... that means this is a part of the API.
 
 */
-ree.localEmit = function () {
+RemoteEventEmitter.prototype.localEmit = function () {
   var args = [].slice.call(arguments)
   return EventEmitter.prototype.emit.apply(this, args)
 }
